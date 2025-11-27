@@ -1,0 +1,34 @@
+services:
+  dev-backend:
+    image: maven:3.9.4-eclipse-temurin-21
+    working_dir: /app
+    volumes:
+      - ./backend:/app:delegated
+      - m2-cache:/root/.m2
+    environment:
+      - SPRING_JPA_SHOW_SQL=false
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/demo
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    command: mvn -DskipTests spring-boot:run
+    ports:
+      - "8081:8080"
+    depends_on:
+      - db
+
+  dev-frontend:
+    image: node:18-bullseye-slim
+    working_dir: /app
+    volumes:
+      - ./frontend:/app:delegated
+      - /app/node_modules
+    environment:
+      - BACKEND_URL=http://dev-backend:8080
+    command: sh -c "npm install --no-audit --no-fund && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5173:5173"
+    depends_on:
+      - dev-backend
+
+volumes:
+  m2-cache:
