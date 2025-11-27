@@ -5,6 +5,8 @@ COPY frontend/package*.json ./frontend/
 WORKDIR /app/frontend
 RUN npm install --no-audit --no-fund
 COPY frontend/ .
+# 実行権限を付与
+RUN chmod +x node_modules/.bin/* || true
 RUN npm run build
 
 # --- バックエンド(Spring Boot)ビルド ---
